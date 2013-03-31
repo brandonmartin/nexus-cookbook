@@ -11,6 +11,6 @@ version          IO.read(File.join(File.dirname(__FILE__), 'VERSION')) rescue "0
 end
 
 depends "java", "~> 1.9.0"
-depends "nginx", "~> 1.2.0"
+depends "nginx", "~> 1.2"
 depends "artifact", "~> 1.2.0"
 depends "build-essential"
