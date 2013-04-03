@@ -85,7 +85,10 @@ class Chef
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
-          {}
+          {
+            :repositories => [
+            ]
+          }
         else
           get_nexus_data_bag(node)[:proxy_repositories]
         end
@@ -207,7 +210,7 @@ class Chef
       # @param  node [Chef::Node] the node
       # 
       # @return [Boolean] true if a connection could be made, false otherwise
-      def nexus_available?(node)        
+      def nexus_available?(node)
         retries = node[:nexus][:cli][:retries]
         begin
           nexus(node)
