@@ -119,11 +119,11 @@ artifact_deploy node[:nexus][:name] do
 
     case node[:nexus][:init_style]
     when "upstart"
-      template "#{bin_dir}/#{node[:nexus][:name]}-upstart.conf" do
+      template "/etc/init/nexus.conf" do
         source "nexus-upstart.conf.erb"
         owner  node[:nexus][:user]
         group  node[:nexus][:group]
-        mode   "0775"
+        mode   00644
         variables(
           :platform      => platform,
           :nexus_home    => nexus_home,
@@ -133,9 +133,6 @@ artifact_deploy node[:nexus][:name] do
           :respawn_limit => node[:nexus][:upstart][:respawn_limit],
           :runlevels     => node[:nexus][:upstart][:runlevels]
         )
-      end
-      link "/etc/init/nexus.conf" do
-        to "#{bin_dir}/nexus-upstart.conf"
       end
     else # init
       template "#{bin_dir}/#{node[:nexus][:name]}" do
