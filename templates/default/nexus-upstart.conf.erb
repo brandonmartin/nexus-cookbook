@@ -8,8 +8,8 @@ env NEXUS_HOME="<%= @nexus_home %>"
 env PLATFORM="<%= @platform %>"
 env PIDFILE="<%= @nexus_pid %>/nexus.pid"
 
-env WRAPPER_CMD="${NEXUS_HOME}/bin/jsw/${PLATFORM}/wrapper"
-env WRAPPER_CONF="${NEXUS_HOME}/bin/jsw/conf/wrapper.conf"
+env WRAPPER_CMD="<%= @nexus_home %>/bin/jsw/<%= @platform %>/wrapper"
+env WRAPPER_CONF="<%= @nexus_home %>/bin/jsw/conf/wrapper.conf"
 
 respawn
 
@@ -23,5 +23,4 @@ setuid <%= @nexus_user %>
 setgid <%= @nexus_group %>
 
 exec ${WRAPPER_CMD} "${WRAPPER_CONF}" wrapper.syslog.ident=nexus wrapper.pidfile="${PIDFILE}" wrapper.daemonize=FALSE
-# /opt/nexus/releases/2.3.1-01/nexus-2.3.1-01/bin/jsw/linux-x86-64/wrapper /opt/nexus/releases/2.3.1-01/nexus-2.3.1-01/bin/jsw/conf/wrapper.conf wrapper.syslog.ident=nexus wrapper.pidfile=/opt/nexus/shared/pids/nexus.pid wrapper.daemonize=TRUE
 
