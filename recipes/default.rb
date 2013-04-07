@@ -121,8 +121,8 @@ artifact_deploy node[:nexus][:name] do
     when "upstart"
       template "/etc/init/nexus.conf" do
         source "nexus-upstart.conf.erb"
-        owner  node[:nexus][:user]
-        group  node[:nexus][:group]
+        owner  'root'
+        group  'root'
         mode   00644
         variables(
           :platform      => platform,
