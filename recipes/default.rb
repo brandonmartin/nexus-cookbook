@@ -116,19 +116,42 @@ artifact_deploy node[:nexus][:name] do
     conf_dir   = ::File.join(nexus_home, "conf")
     bin_dir    = ::File.join(nexus_home, "bin")
 
-    template "#{bin_dir}/#{node[:nexus][:name]}" do
-      source "nexus.erb"
-      owner  node[:nexus][:user]
-      group  node[:nexus][:group]
-      mode   "0775"
-      variables(
-        :platform   => platform,
-        :nexus_home => nexus_home,
-        :nexus_user => node[:nexus][:user],
-        :nexus_pid  => node[:nexus][:pid_dir]
-      )
+
+    case node[:nexus][:init_style]
+    when "upstart"
+      template "/etc/init/nexus.conf" do
+        source "nexus-upstart.conf.erb"
+        owner  'root'
+        group  'root'
+        mode   00644
+        variables(
+          :platform      => platform,
+          :nexus_home    => nexus_home,
+          :nexus_user    => node[:nexus][:user],
+          :nexus_group   => node[:nexus][:group],
+          :nexus_pid     => node[:nexus][:pid_dir],
+          :respawn_limit => node[:nexus][:upstart][:respawn_limit],
+          :runlevels     => node[:nexus][:upstart][:runlevels]
+        )
+      end
+    else # init
+      template "#{bin_dir}/#{node[:nexus][:name]}" do
+        source "nexus.erb"
+        owner  node[:nexus][:user]
+        group  node[:nexus][:group]
+        mode   "0775"
+        variables(
+          :platform   => platform,
+          :nexus_home => nexus_home,
+          :nexus_user => node[:nexus][:user],
+          :nexus_pid  => node[:nexus][:pid_dir]
+        )
+      end
+      link "/etc/init.d/nexus" do
+        to "#{bin_dir}/nexus"
+      end
     end
-    
+
     template "#{conf_dir}/nexus.properties" do
       source "nexus.properties.erb"
       owner  node[:nexus][:user]
@@ -161,14 +184,20 @@ artifact_deploy node[:nexus][:name] do
       end
     end
 
-    link "/etc/init.d/nexus" do
-      to "#{bin_dir}/nexus"
-    end
   }
 end
 
-service "nexus" do
-  action   [:enable, :start]
+case node[:nexus][:init_style]
+when "upstart"
+  service "nexus" do
+    provider Chef::Provider::Service::Upstart
+    supports :status => true, :restart => true, :reload => true
+    action   [:enable, :start]
+  end
+else # init
+  service "nexus" do
+    action   [:enable, :start]
+  end
 end
 
 if node[:nexus][:ssl][:nginx]

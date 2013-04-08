@@ -37,6 +37,9 @@ default[:nexus][:work_dir]                                     = "/nexus/sonatyp
 
 default[:nexus][:plugins]                                      = []
 
+default[:nexus][:init_style]                                   = 'init'
+default[:nexus][:upstart][:respawn_limit]                      = nil
+default[:nexus][:upstart][:runlevels]                          = '2345'
 default[:nexus][:jetty][:loopback]                             = false
 
 default[:nexus][:ssl][:jetty]                                  = false
